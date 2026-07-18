@@ -115,9 +115,9 @@ var validators = []providerValidator{
 	},
 	{
 		name:     "Blackbox AI",
-		patterns: []*regexp.Regexp{},
-		endpoint: "",
-		header:   "",
+		patterns: []*regexp.Regexp{regexp.MustCompile(`^bb_`)},
+		endpoint: "https://api.blackbox.ai/v1/models",
+		header:   "Bearer",
 	},
 	{
 		name:     "OpenCode",

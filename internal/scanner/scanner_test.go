@@ -75,3 +75,60 @@ func TestExtractValueCRLF(t *testing.T) {
 		t.Errorf("ExtractValue = %q, want sk-proj-abc123xyz", result)
 	}
 }
+
+func TestExtractValueEmptyValue(t *testing.T) {
+	fragment := "OPENAI_API_KEY="
+	result := ExtractValue(fragment, "OPENAI_API_KEY")
+	if result != "" {
+		t.Errorf("ExtractValue = %q, want empty string", result)
+	}
+}
+
+func TestExtractValuePlaceholder(t *testing.T) {
+	fragment := "OPENAI_API_KEY=your_api_key_here"
+	result := ExtractValue(fragment, "OPENAI_API_KEY")
+	if result != "" {
+		t.Errorf("ExtractValue = %q, want empty string for placeholder", result)
+	}
+}
+
+func TestExtractValueTemplatePlaceholder(t *testing.T) {
+	fragment := "OPENAI_API_KEY=<your_openai_api_key>"
+	result := ExtractValue(fragment, "OPENAI_API_KEY")
+	if result != "" {
+		t.Errorf("ExtractValue = %q, want empty string for template placeholder", result)
+	}
+}
+
+func TestIsPlaceholderTrue(t *testing.T) {
+	cases := []string{
+		"your_api_key",
+		"YOUR-API-KEY",
+		"your_key_here_123",
+		"<your_secret>",
+		"placeholder",
+		"changeme",
+		"change_this",
+		"",
+	}
+	for _, v := range cases {
+		if !IsPlaceholder(v) {
+			t.Errorf("IsPlaceholder(%q) = false, want true", v)
+		}
+	}
+}
+
+func TestIsPlaceholderFalse(t *testing.T) {
+	cases := []string{
+		"sk-proj-abc123xyz",
+		"sk-ant-api03-abc123",
+		"ghp_abc123def456",
+		"hf_abc123xyz",
+		"bb_abc123def456",
+	}
+	for _, v := range cases {
+		if IsPlaceholder(v) {
+			t.Errorf("IsPlaceholder(%q) = true, want false", v)
+		}
+	}
+}

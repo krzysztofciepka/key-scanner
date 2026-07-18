@@ -181,10 +181,47 @@ func ExtractValue(fragment, envVar string) string {
 		}
 		value = strings.TrimSpace(value)
 		value = strings.Trim(value, `"'`)
-		if value != "" {
+		if value != "" && !IsPlaceholder(value) {
 			return value
 		}
 	}
 
 	return ""
+}
+
+var placeholderPatterns = []string{
+	"your_api_key",
+	"your-api-key",
+	"your_key",
+	"your-key",
+	"your_token",
+	"your-token",
+	"your_secret",
+	"your-secret",
+	"api_key_here",
+	"api-key-here",
+	"key_here",
+	"key-here",
+	"token_here",
+	"token-here",
+	"placeholder",
+	"changeme",
+	"change_me",
+	"changethis",
+	"change_this",
+	"<your_",
+	"<api_",
+}
+
+func IsPlaceholder(value string) bool {
+	lower := strings.ToLower(value)
+	for _, p := range placeholderPatterns {
+		if strings.Contains(lower, p) {
+			return true
+		}
+	}
+	if value == "" {
+		return true
+	}
+	return false
 }
