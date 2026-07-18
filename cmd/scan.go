@@ -16,7 +16,7 @@ import (
 
 func RunScan(args []string) error {
 	fs := flag.NewFlagSet("scan", flag.ContinueOnError)
-	limit := fs.Int("limit", 100, "max results per pattern")
+	limit := fs.Int("limit", 10, "max results per pattern")
 	patternFilter := fs.String("pattern", "", "search only a specific key pattern")
 	outputPath := fs.String("output", "", "output file path (default: key-scanner-YYYY-MM-DD-HHmmss.txt)")
 	if err := fs.Parse(args); err != nil {
