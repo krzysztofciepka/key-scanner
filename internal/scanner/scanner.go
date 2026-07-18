@@ -150,10 +150,15 @@ func (c *Client) GetCommitDate(ctx context.Context, repo, path string) (string, 
 	if len(date) >= 10 {
 		return date[:10], nil
 	}
+	if date == "" {
+		return "unknown", nil
+	}
 	return date, nil
 }
 
 func ExtractValue(fragment, envVar string) string {
+	fragment = strings.NewReplacer("<em>", "", "</em>", "").Replace(fragment)
+
 	patterns := []string{
 		envVar + "=",
 		envVar + " =",
