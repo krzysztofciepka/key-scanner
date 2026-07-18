@@ -73,7 +73,7 @@ var validators = []providerValidator{
 	},
 	{
 		name:     "DeepSeek",
-		patterns: []*regexp.Regexp{},
+		patterns: []*regexp.Regexp{regexp.MustCompile(`^sk[-_]`)},
 		endpoint: "https://api.deepseek.com/user/balance",
 		header:   "Bearer",
 	},
