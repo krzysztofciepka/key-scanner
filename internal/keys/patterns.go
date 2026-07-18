@@ -30,7 +30,7 @@ var BuiltinPatterns = []Pattern{
 
 func FilterByEnvVar(envVar string) []Pattern {
 	if envVar == "" {
-		return BuiltinPatterns
+		return append([]Pattern{}, BuiltinPatterns...)
 	}
 	for _, p := range BuiltinPatterns {
 		if p.EnvVar == envVar {
