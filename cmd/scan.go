@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"sort"
 	"strings"
 	"time"
 
@@ -17,6 +18,7 @@ func RunScan(args []string) error {
 	fs := flag.NewFlagSet("scan", flag.ContinueOnError)
 	limit := fs.Int("limit", 100, "max results per pattern")
 	patternFilter := fs.String("pattern", "", "search only a specific key pattern")
+	outputPath := fs.String("output", "", "output file path (default: key-scanner-YYYY-MM-DD-HHmmss.txt)")
 	if err := fs.Parse(args); err != nil {
 		return err
 	}
@@ -85,6 +87,48 @@ func RunScan(args []string) error {
 		time.Sleep(2 * time.Second)
 	}
 
+	results = topPerKey(results, 10)
+
 	output.PrintTable(results)
+
+	path := *outputPath
+	if path == "" {
+		path = fmt.Sprintf("key-scanner-%s.txt", time.Now().Format("2006-01-02-150405"))
+	}
+	if err := output.WriteFile(path, results); err != nil {
+		return fmt.Errorf("write output file: %w", err)
+	}
+	fmt.Fprintf(os.Stderr, "Saved to %s\n", path)
+
 	return nil
+}
+
+func topPerKey(results []scanner.Result, n int) []scanner.Result {
+	sort.SliceStable(results, func(i, j int) bool {
+		return results[i].CommitDate > results[j].CommitDate
+	})
+
+	grouped := make(map[string][]scanner.Result)
+	var order []string
+	for _, r := range results {
+		if _, ok := grouped[r.Key]; !ok {
+			order = append(order, r.Key)
+		}
+		grouped[r.Key] = append(grouped[r.Key], r)
+	}
+
+	var top []scanner.Result
+	for _, key := range order {
+		g := grouped[key]
+		if len(g) > n {
+			g = g[:n]
+		}
+		top = append(top, g...)
+	}
+
+	sort.SliceStable(top, func(i, j int) bool {
+		return top[i].CommitDate > top[j].CommitDate
+	})
+
+	return top
 }
