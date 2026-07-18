@@ -148,6 +148,14 @@ func LookupProvider(name string) (*providerValidator, bool) {
 	return nil, false
 }
 
+func ProviderNames() []string {
+	names := make([]string, len(validators))
+	for i, v := range validators {
+		names[i] = v.name
+	}
+	return names
+}
+
 func ValidateKey(ctx context.Context, provider, value string) (bool, error) {
 	pv, ok := LookupProvider(provider)
 	if !ok {

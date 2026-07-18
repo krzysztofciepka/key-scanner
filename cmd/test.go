@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/krzysztofciepka/key-scanner/internal/keys"
 )
@@ -27,9 +28,12 @@ func RunTest(args []string) error {
 	useProvider := *provider
 	if useProvider == "" {
 		if detectedProvider == "" {
-			return fmt.Errorf("could not auto-detect provider from key format; use --provider to specify one")
+			providers := strings.Join(keys.ProviderNames(), ", ")
+			return fmt.Errorf("could not auto-detect provider from key format; use --provider with one of: %s", providers)
 		}
 		useProvider = detectedProvider
+	} else if detectedProvider != "" && detectedProvider != useProvider {
+		fmt.Fprintf(os.Stderr, "Note: detected prefix matches %s, but using --provider %s\n", detectedProvider, useProvider)
 	}
 
 	fmt.Fprintf(os.Stderr, "Testing key against %s...\n", useProvider)
