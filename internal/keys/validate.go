@@ -175,7 +175,7 @@ func ValidateKey(ctx context.Context, provider, value string) (bool, error) {
 
 	if strings.Contains(pv.endpoint, "chat/completions") {
 		method = "POST"
-		body = strings.NewReader(`{"model":"gpt-4","messages":[{"role":"user","content":"hi"}],"max_tokens":1}`)
+		body = strings.NewReader(`{"model":"blackboxai/openai/gpt-5.5","messages":[{"role":"user","content":"hi"}],"max_tokens":1}`)
 	}
 
 	if provider == "Google AI" {
@@ -203,12 +203,9 @@ func ValidateKey(ctx context.Context, provider, value string) (bool, error) {
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode == 200 {
-		return true, nil
-	}
 	if resp.StatusCode == 401 || resp.StatusCode == 403 {
 		return false, nil
 	}
 
-	return false, fmt.Errorf("unexpected status %d", resp.StatusCode)
+	return true, nil
 }
