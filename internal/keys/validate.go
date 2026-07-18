@@ -138,18 +138,19 @@ func DetectProvider(value string) string {
 	return ""
 }
 
-func LookupProvider(name string) *providerValidator {
+func LookupProvider(name string) (*providerValidator, bool) {
 	for i := range validators {
 		if validators[i].name == name {
-			return &validators[i]
+			v := validators[i]
+			return &v, true
 		}
 	}
-	return nil
+	return nil, false
 }
 
 func ValidateKey(ctx context.Context, provider, value string) (bool, error) {
-	pv := LookupProvider(provider)
-	if pv == nil {
+	pv, ok := LookupProvider(provider)
+	if !ok {
 		return false, fmt.Errorf("unknown provider: %s", provider)
 	}
 
