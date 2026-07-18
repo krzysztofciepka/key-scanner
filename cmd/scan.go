@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/krzysztofciepka/key-scanner/internal/keys"
@@ -13,10 +14,12 @@ import (
 )
 
 func RunScan(args []string) error {
-	fs := flag.NewFlagSet("scan", flag.ExitOnError)
+	fs := flag.NewFlagSet("scan", flag.ContinueOnError)
 	limit := fs.Int("limit", 100, "max results per pattern")
 	patternFilter := fs.String("pattern", "", "search only a specific key pattern")
-	fs.Parse(args)
+	if err := fs.Parse(args); err != nil {
+		return err
+	}
 
 	token := os.Getenv("GITHUB_TOKEN")
 	if token == "" {
@@ -40,6 +43,10 @@ func RunScan(args []string) error {
 
 		items, err := client.Search(ctx, query, *limit)
 		if err != nil {
+			errStr := err.Error()
+			if strings.Contains(errStr, "invalid GitHub token") || strings.Contains(errStr, "401") {
+				return err
+			}
 			fmt.Fprintf(os.Stderr, "  warning: %v\n", err)
 			time.Sleep(2 * time.Second)
 			continue

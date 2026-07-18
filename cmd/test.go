@@ -10,9 +10,11 @@ import (
 )
 
 func RunTest(args []string) error {
-	fs := flag.NewFlagSet("test", flag.ExitOnError)
+	fs := flag.NewFlagSet("test", flag.ContinueOnError)
 	provider := fs.String("provider", "", "force a specific provider for validation")
-	fs.Parse(args)
+	if err := fs.Parse(args); err != nil {
+		return err
+	}
 
 	if fs.NArg() < 1 {
 		return fmt.Errorf("usage: key-scanner test [--provider NAME] <key-value>")
