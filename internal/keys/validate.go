@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"regexp"
+	"strings"
 	"time"
 )
 
@@ -116,7 +117,7 @@ var validators = []providerValidator{
 	{
 		name:     "Blackbox AI",
 		patterns: []*regexp.Regexp{regexp.MustCompile(`^bb_`)},
-		endpoint: "https://api.blackbox.ai/v1/models",
+		endpoint: "https://api.blackbox.ai/v1/chat/completions",
 		header:   "Bearer",
 	},
 	{
@@ -170,15 +171,22 @@ func ValidateKey(ctx context.Context, provider, value string) (bool, error) {
 
 	endpoint := pv.endpoint
 	method := "GET"
+	var body *strings.Reader
+
+	if strings.Contains(pv.endpoint, "chat/completions") {
+		method = "POST"
+		body = strings.NewReader(`{"model":"gpt-4","messages":[{"role":"user","content":"hi"}],"max_tokens":1}`)
+	}
 
 	if provider == "Google AI" {
 		endpoint = endpoint + value
 	}
 
-	req, err := http.NewRequestWithContext(ctx, method, endpoint, nil)
+	req, err := http.NewRequestWithContext(ctx, method, endpoint, body)
 	if err != nil {
 		return false, fmt.Errorf("create request: %w", err)
 	}
+	req.Header.Set("Content-Type", "application/json")
 
 	switch pv.header {
 	case "Bearer":
