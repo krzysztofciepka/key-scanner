@@ -21,7 +21,7 @@ var validators = []providerValidator{
 	{
 		name:     "OpenAI",
 		patterns: []*regexp.Regexp{regexp.MustCompile(`^sk-(proj|admin|svcacct)-`)},
-		endpoint: "https://api.openai.com/v1/models",
+		endpoint: "https://api.openai.com/v1/chat/completions",
 		header:   "Bearer",
 	},
 	{
@@ -33,7 +33,7 @@ var validators = []providerValidator{
 	{
 		name:     "OpenRouter",
 		patterns: []*regexp.Regexp{regexp.MustCompile(`^sk-or-v[12]-`)},
-		endpoint: "https://openrouter.ai/api/v1/models",
+		endpoint: "https://openrouter.ai/api/v1/chat/completions",
 		header:   "Bearer",
 	},
 	{
@@ -64,13 +64,13 @@ var validators = []providerValidator{
 	{
 		name:     "Groq",
 		patterns: []*regexp.Regexp{regexp.MustCompile(`^gsk_`)},
-		endpoint: "https://api.groq.com/openai/v1/models",
+		endpoint: "https://api.groq.com/openai/v1/chat/completions",
 		header:   "Bearer",
 	},
 	{
 		name:     "Together AI",
 		patterns: []*regexp.Regexp{},
-		endpoint: "https://api.together.xyz/v1/models",
+		endpoint: "https://api.together.xyz/v1/chat/completions",
 		header:   "Bearer",
 	},
 	{
@@ -88,7 +88,7 @@ var validators = []providerValidator{
 	{
 		name:     "Mistral",
 		patterns: []*regexp.Regexp{},
-		endpoint: "https://api.mistral.ai/v1/models",
+		endpoint: "https://api.mistral.ai/v1/chat/completions",
 		header:   "Bearer",
 	},
 	{
@@ -106,7 +106,7 @@ var validators = []providerValidator{
 	{
 		name:     "xAI",
 		patterns: []*regexp.Regexp{regexp.MustCompile(`^xai-`)},
-		endpoint: "https://api.x.ai/v1/models",
+		endpoint: "https://api.x.ai/v1/chat/completions",
 		header:   "Bearer",
 	},
 	{
@@ -176,7 +176,7 @@ func ValidateKey(ctx context.Context, provider, value string) (bool, error) {
 
 	if strings.Contains(pv.endpoint, "chat/completions") {
 		method = "POST"
-		body = strings.NewReader(`{"model":"blackboxai/openai/gpt-5.5","messages":[{"role":"user","content":"hi"}],"max_tokens":1}`)
+		body = strings.NewReader(`{"model":"gpt-4o-mini","messages":[{"role":"user","content":"hi"}],"max_tokens":1}`)
 	}
 
 	if provider == "Google AI" {
