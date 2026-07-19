@@ -3,6 +3,7 @@ package keys
 import (
 	"context"
 	"fmt"
+	"io"
 	"net/http"
 	"regexp"
 	"strings"
@@ -171,7 +172,7 @@ func ValidateKey(ctx context.Context, provider, value string) (bool, error) {
 
 	endpoint := pv.endpoint
 	method := "GET"
-	var body *strings.Reader
+	var body io.Reader
 
 	if strings.Contains(pv.endpoint, "chat/completions") {
 		method = "POST"
@@ -186,7 +187,9 @@ func ValidateKey(ctx context.Context, provider, value string) (bool, error) {
 	if err != nil {
 		return false, fmt.Errorf("create request: %w", err)
 	}
-	req.Header.Set("Content-Type", "application/json")
+	if body != nil {
+		req.Header.Set("Content-Type", "application/json")
+	}
 
 	switch pv.header {
 	case "Bearer":
