@@ -87,7 +87,7 @@ func RunScan(args []string) error {
 		time.Sleep(2 * time.Second)
 	}
 
-	results = topPerKey(results, 10)
+	results = topPerKey(results, *limit)
 
 	output.PrintTable(results)
 
